@@ -8,6 +8,7 @@ A Discord chatbot powered by NanoGPT API (subscription models only)
 - Support for custom system prompts (via environment variable)
 - Document context support (PDF, TXT, MD, and more)
 - Per-user and per-server model preferences
+- AI image generation with multiple models
 
 ## Setup
 
@@ -63,7 +64,9 @@ docker compose exec bot bun run register
 
 | Command | Description |
 |---------|-------------|
-| `/chat <message>` | Chat with the AI. Optionally include a saved context. |
+| `/help` | Show all available commands and how to use them |
+| `/chat <message>` | Chat with the AI |
+| `/imagine <prompt>` | Generate an image from a text prompt |
 | `/models` | List all available subscription models |
 | `/setmodel <model>` | Set your default model (personal or server-wide) |
 | `/usage` | Check your NanoGPT API usage statistics |
@@ -71,6 +74,36 @@ docker compose exec bot bun run register
 | `/context list` | List all saved contexts |
 | `/context view <name>` | View content of a saved context |
 | `/context remove <name>` | Remove a saved context |
+
+### /chat Options
+
+| Option | Description |
+|--------|-------------|
+| `message` | (required) Your message to the AI |
+| `context` | Name of a saved context to include |
+| `model` | Override the default model for this message |
+| `websearch` | Enable web search for real-time info ($0.006/request) |
+| `deepsearch` | Enable deep web search for comprehensive info ($0.06/request) |
+| `image` | Attach an image to analyze (png, jpg, jpeg, webp) |
+
+### /context Scopes
+
+Contexts can be personal or shared with the server:
+- `scope:user` (default) - Personal context, only you can access
+- `scope:server` - Shared context, available to all server members
+
+### /imagine Options
+
+| Option | Description |
+|--------|-------------|
+| `prompt` | (required) Text description of the image |
+| `model` | Image model to use (autocomplete available) |
+| `size` | Image size: 256x256, 512x512, or 1024x1024 |
+| `guidance` | How closely to follow the prompt (0-20) |
+| `steps` | Denoising steps (1-100) |
+| `seed` | Random seed for reproducible results |
+| `image` | Input image for img2img transformation |
+| `strength` | Img2img strength (0-1) |
 
 ## Document Support
 
