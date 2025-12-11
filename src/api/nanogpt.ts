@@ -110,6 +110,29 @@ export interface ImageGenerationResponse {
     remainingBalance?: number;
 }
 
+export interface ScrapeResult {
+    url: string;
+    success: boolean;
+    title?: string;
+    content?: string;
+    markdown?: string;
+    error?: string;
+}
+
+export interface ScrapeSummary {
+    requested: number;
+    processed: number;
+    successful: number;
+    failed: number;
+    totalCost: number;
+    stealthModeUsed: boolean;
+}
+
+export interface ScrapeUrlsResponse {
+    results: ScrapeResult[];
+    summary: ScrapeSummary;
+}
+
 function getModelWithWebSearch(model: string, webSearch: "none" | "standard" | "deep"): string {
     switch (webSearch) {
         case "standard":
@@ -221,6 +244,16 @@ class NanoGPTClient {
             return response;
         }
         return response.data || [];
+    }
+
+    async scrapeUrls(urls: string[], stealthMode: boolean = false): Promise<ScrapeUrlsResponse> {
+        return this.request<ScrapeUrlsResponse>("/scrape-urls", {
+            method: "POST",
+            body: JSON.stringify({
+                urls,
+                stealthMode,
+            }),
+        });
     }
 }
 

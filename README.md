@@ -44,7 +44,7 @@ DISCORD_TOKEN=your_discord_bot_token
 DISCORD_CLIENT_ID=your_discord_application_id
 NANOGPT_API_KEY=your_nanogpt_api_key
 SYSTEM_PROMPT=
-DEFAULT_MODEL=zai-org/GLM-4.5-Air
+DEFAULT_MODEL=zai-org/glm-4.6v
 ```
 
 ### 4. Deploy with Docker Compose
@@ -71,6 +71,7 @@ docker compose exec bot bun run register
 | `/memory stats` | Show your memory statistics |
 | `/memory clear` | Clear your conversation memory |
 | `/imagine <prompt>` | Generate an image from a text prompt |
+| `/scrape <url>` | Scrape content from web pages |
 | `/models` | List all available subscription models |
 | `/setmodel <model>` | Set your default model (personal or server-wide) |
 | `/usage` | Check your NanoGPT API usage statistics |
@@ -108,6 +109,27 @@ Contexts can be personal or shared with the server:
 | `seed` | Random seed for reproducible results |
 | `image` | Input image for img2img transformation |
 | `strength` | Img2img strength (0-1) |
+
+### /scrape Options
+
+| Option | Description |
+|--------|-------------|
+| `url` | (required) URL to scrape |
+| `url2` - `url5` | Additional URLs (up to 5 total) |
+| `stealth` | Use stealth mode for tougher targets (5x cost, $0.005/URL) |
+| `download` | Attach results as .md file(s) |
+
+## Feature Toggles
+
+Control feature availability via environment variables:
+
+| Value | Effect |
+|-------|--------|
+| `false` | Feature enabled for everyone (default) |
+| `true` | Feature disabled for everyone |
+| `admin` | Feature only available to admin users (see `CONTEXT_ADMIN_USERS`) |
+
+Available toggles: `DISABLE_WEBSEARCH`, `DISABLE_DEEPSEARCH`, `DISABLE_IMAGEGEN`, `DISABLE_SCRAPE`
 
 ## Document Support
 

@@ -87,6 +87,17 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                     "• `/memory clear` - Clear your conversation memory",
                 ].join("\n"),
                 inline: false,
+            },
+            {
+                name: "/scrape",
+                value: [
+                    "Scrape content from web pages.",
+                    "**Options:**",
+                    "• `url` (required) - URL to scrape (up to 5 URLs: url, url2-url5)",
+                    "• `stealth` - Use stealth mode for tougher targets (5x cost)",
+                    "• `download` - Attach results as .md file(s)",
+                ].join("\n"),
+                inline: false,
             }
         )
         .setFooter({ text: "Tip: Use /memory for persistent conversations, or /chat for stateless queries!" })

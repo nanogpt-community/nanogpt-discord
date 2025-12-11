@@ -8,6 +8,7 @@ import * as context from "./context.ts";
 import * as help from "./help.ts";
 import * as imagine from "./imagine.ts";
 import * as memory from "./memory.ts";
+import * as scrape from "./scrape.ts";
 
 export interface Command {
     data: Pick<SlashCommandBuilder, "name" | "toJSON">;
@@ -18,7 +19,7 @@ export interface Command {
 export const commands = new Collection<string, Command>();
 
 // Register all commands
-const commandModules = [chat, models, setmodel, usage, context, help, imagine, memory];
+const commandModules = [chat, models, setmodel, usage, context, help, imagine, memory, scrape];
 
 for (const command of commandModules) {
     commands.set(command.data.name, command as Command);

@@ -6,6 +6,7 @@ import {
     AutocompleteInteraction,
 } from "discord.js";
 import { nanogpt, type ImageGenerationOptions } from "../../api/nanogpt.ts";
+import { canUseFeature } from "../../utils/features.ts";
 
 const VALID_IMAGE_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
@@ -160,14 +161,10 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const imageAttachment = interaction.options.getAttachment("image");
     const strength = interaction.options.getNumber("strength");
 
-    // Check if image generation is disabled
-    const isImageGenDisabled = process.env.DISABLE_IMAGEGEN === "true";
-
-    if (isImageGenDisabled) {
-        await interaction.reply({
-            content: "Image generation is disabled on this bot.",
-            ephemeral: true,
-        });
+    // Check feature access
+    const featureCheck = canUseFeature(interaction, "IMAGEGEN");
+    if (!featureCheck.allowed) {
+        await interaction.reply({ content: featureCheck.reason, ephemeral: true });
         return;
     }
 

@@ -7,6 +7,7 @@ import {
 } from "discord.js";
 import { nanogpt, type ChatMessage, type TextPart, type ImagePart } from "../../api/nanogpt.ts";
 import { getDefaultModel, getContext, getAllContexts } from "../../db/index.ts";
+import { canUseFeature } from "../../utils/features.ts";
 
 const SYSTEM_PROMPT = process.env.SYSTEM_PROMPT || "You are a helpful AI assistant.";
 
@@ -130,24 +131,21 @@ export async function execute(interaction: ChatInputCommandInteraction) {
     const guildId = interaction.guildId || "dm";
     const userId = interaction.user.id;
 
-    // Check if features are disabled via environment variables
-    const isWebSearchDisabled = process.env.DISABLE_WEBSEARCH === "true";
-    const isDeepSearchDisabled = process.env.DISABLE_DEEPSEARCH === "true";
-
-    if (webSearch && isWebSearchDisabled) {
-        await interaction.reply({
-            content: "Web search is disabled on this bot.",
-            ephemeral: true,
-        });
-        return;
+    // Check feature access
+    if (webSearch) {
+        const check = canUseFeature(interaction, "WEBSEARCH");
+        if (!check.allowed) {
+            await interaction.reply({ content: check.reason, ephemeral: true });
+            return;
+        }
     }
 
-    if (deepSearch && isDeepSearchDisabled) {
-        await interaction.reply({
-            content: "Deep search is disabled on this bot.",
-            ephemeral: true,
-        });
-        return;
+    if (deepSearch) {
+        const check = canUseFeature(interaction, "DEEPSEARCH");
+        if (!check.allowed) {
+            await interaction.reply({ content: check.reason, ephemeral: true });
+            return;
+        }
     }
 
     // Defer the reply since API calls can take time

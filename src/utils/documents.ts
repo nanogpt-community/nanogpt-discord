@@ -38,14 +38,11 @@ export async function parseDocument(
 
 async function parsePDF(buffer: Buffer, filename: string): Promise<ParsedDocument> {
     try {
-        const parser = new PDFParse({ data: buffer });
-        const result = await parser.getText();
+        const result = await pdfParse(buffer);
 
         if (!result.text || result.text.trim().length === 0) {
             throw new Error("No text content could be extracted from the PDF. It may be an image-based PDF.");
         }
-
-        await parser.destroy();
 
         return {
             content: result.text.trim(),
