@@ -45,6 +45,17 @@ db.exec(`
     created_at INTEGER DEFAULT (unixepoch()),
     UNIQUE(guild_id, user_id, name)
   );
+
+  -- Per-user conversation memory (global across servers)
+  CREATE TABLE IF NOT EXISTS memories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id TEXT NOT NULL,
+    role TEXT NOT NULL,
+    content TEXT NOT NULL,
+    model TEXT,
+    created_at INTEGER DEFAULT (unixepoch())
+  );
+  CREATE INDEX IF NOT EXISTS idx_memories_user ON memories(user_id, created_at);
 `);
 
 // Add user_id column if it doesn't exist (migration for existing databases)
@@ -178,5 +189,45 @@ export function removeContext(guildId: string, name: string, userId?: string): b
     return result.changes > 0;
 }
 
-console.log("[DB] Database initialized at", DATABASE_PATH);
+// Memory queries (global per-user)
+const memoryQueries = {
+    insertMemory: db.prepare(
+        "INSERT INTO memories (user_id, role, content, model) VALUES (?, ?, ?, ?)"
+    ),
+    getMemoryHistory: db.prepare<
+        { id: number; user_id: string; role: string; content: string; model: string | null; created_at: number },
+        [string, number]
+    >("SELECT * FROM memories WHERE user_id = ? ORDER BY created_at DESC LIMIT ?"),
+    clearMemory: db.prepare("DELETE FROM memories WHERE user_id = ?"),
+    getMemoryStats: db.prepare<
+        { count: number; first_at: number | null; last_at: number | null },
+        [string]
+    >("SELECT COUNT(*) as count, MIN(created_at) as first_at, MAX(created_at) as last_at FROM memories WHERE user_id = ?"),
+};
 
+// Memory functions (global per-user, not per-guild)
+export function addMemoryMessage(userId: string, role: "user" | "assistant", content: string, model?: string): void {
+    memoryQueries.insertMemory.run(userId, role, content, model || null);
+}
+
+export function getMemoryHistory(userId: string, limit: number = 20): { role: string; content: string }[] {
+    const rows = memoryQueries.getMemoryHistory.all(userId, limit);
+    // Reverse to get chronological order (oldest first)
+    return rows.reverse().map(row => ({ role: row.role, content: row.content }));
+}
+
+export function clearMemory(userId: string): number {
+    const result = memoryQueries.clearMemory.run(userId);
+    return result.changes;
+}
+
+export function getMemoryStats(userId: string): { count: number; firstAt: Date | null; lastAt: Date | null } {
+    const row = memoryQueries.getMemoryStats.get(userId);
+    return {
+        count: row?.count || 0,
+        firstAt: row?.first_at ? new Date(row.first_at * 1000) : null,
+        lastAt: row?.last_at ? new Date(row.last_at * 1000) : null,
+    };
+}
+
+console.log("[DB] Database initialized at", DATABASE_PATH);

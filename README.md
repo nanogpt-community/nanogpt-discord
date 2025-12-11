@@ -65,7 +65,11 @@ docker compose exec bot bun run register
 | Command | Description |
 |---------|-------------|
 | `/help` | Show all available commands and how to use them |
-| `/chat <message>` | Chat with the AI |
+| `/chat <message>` | Chat with the AI (stateless) |
+| `/memory chat <message>` | Chat with AI that remembers your conversation |
+| `/memory view` | View recent conversation history |
+| `/memory stats` | Show your memory statistics |
+| `/memory clear` | Clear your conversation memory |
 | `/imagine <prompt>` | Generate an image from a text prompt |
 | `/models` | List all available subscription models |
 | `/setmodel <model>` | Set your default model (personal or server-wide) |

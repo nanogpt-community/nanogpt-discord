@@ -75,9 +75,21 @@ export async function execute(interaction: ChatInputCommandInteraction) {
                     "• `strength` - Img2img strength (0-1)",
                 ].join("\n"),
                 inline: false,
+            },
+            {
+                name: "/memory",
+                value: [
+                    "Chat with AI that remembers your conversation history.",
+                    "**Subcommands:**",
+                    "• `/memory chat` - Chat with persistent memory (same options as /chat)",
+                    "• `/memory view` - View recent conversation history",
+                    "• `/memory stats` - Show your memory statistics",
+                    "• `/memory clear` - Clear your conversation memory",
+                ].join("\n"),
+                inline: false,
             }
         )
-        .setFooter({ text: "Tip: Use /context to add documents, then reference them in /chat!" })
+        .setFooter({ text: "Tip: Use /memory for persistent conversations, or /chat for stateless queries!" })
         .setTimestamp();
 
     await interaction.reply({ embeds: [embed] });
